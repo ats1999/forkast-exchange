@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/forkast-exchange/src",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/forkast-exchange/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/forkast-exchange",
+  "projects": {
+    "forkast-exchange": {
+      "type": "application",
+      "root": "apps/forkast-exchange",
+      "entryFile": "main",
+      "sourceRoot": "apps/forkast-exchange/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/forkast-exchange/tsconfig.app.json"
+      }
+    },
+    "order-book-keeping-service": {
+      "type": "application",
+      "root": "apps/order-book-keeping-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/order-book-keeping-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/order-book-keeping-service/tsconfig.app.json"
+      }
+    },
+    "order-management-service": {
+      "type": "application",
+      "root": "apps/order-management-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/order-management-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/order-management-service/tsconfig.app.json"
+      }
+    },
+    "order-matching-engine": {
+      "type": "application",
+      "root": "apps/order-matching-engine",
+      "entryFile": "main",
+      "sourceRoot": "apps/order-matching-engine/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/order-matching-engine/tsconfig.app.json"
+      }
+    }
+  }
+}
