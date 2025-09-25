@@ -28,6 +28,15 @@
         "tsConfigPath": "apps/forkast-exchange/tsconfig.app.json"
       }
     },
+    "infra": {
+      "type": "library",
+      "root": "libs/infra",
+      "entryFile": "index",
+      "sourceRoot": "libs/infra/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/infra/tsconfig.lib.json"
+      }
+    },
     "order-book-keeping-service": {
       "type": "application",
       "root": "apps/order-book-keeping-service",

@@ -28,12 +28,15 @@
     "@nestjs/platform-express": "^11.0.1",
     "@prisma/client": "^6.16.2",
     "bcrypt": "^6.0.0",
+    "class-validator": "^0.14.2",
     "dotenv": "^17.2.2",
+    "kafkajs": "^2.2.4",
     "passport-http": "^0.3.0",
     "prisma": "^6.16.2",
+    "redis": "^5.8.2",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "uuid": "^13.0.0"
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
@@ -82,6 +85,7 @@
     ],
     "moduleNameMapper": {
       "^@app/auth(|/.*)$": "<rootDir>/libs/auth/src/$1",
+      "^@app/infra(|/.*)$": "<rootDir>/libs/infra/src/$1",
       "^@app/prisma(|/.*)$": "<rootDir>/libs/prisma/src/$1"
     }
   }

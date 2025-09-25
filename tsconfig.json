@@ -28,6 +28,12 @@
       "@app/auth/*": [
         "libs/auth/src/*"
       ],
+      "@app/infra": [
+        "libs/infra/src"
+      ],
+      "@app/infra/*": [
+        "libs/infra/src/*"
+      ],
       "@app/prisma": [
         "libs/prisma/src"
       ],
