@@ -64,11 +64,6 @@ export class ExchangeService {
       const buy = buyOrders[0];
       const sell = sellOrders[0];
 
-      // Prevent self-trading
-      if (buy.userId === sell.userId) {
-        continue;
-      }
-
       const isBuyMarket = buy.type === 'MARKET';
       const isSellMarket = sell.type === 'MARKET';
 
