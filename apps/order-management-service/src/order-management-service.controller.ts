@@ -1,12 +1,16 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseGuards, Request } from '@nestjs/common';
 import { OrderManagementServiceService } from './order-management-service.service';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller()
 export class OrderManagementServiceController {
-  constructor(private readonly orderManagementServiceService: OrderManagementServiceService) {}
+  constructor(
+    private readonly orderManagementServiceService: OrderManagementServiceService,
+  ) {}
 
-  @Get()
-  getHello(): string {
-    return this.orderManagementServiceService.getHello();
+  @Get('hello')
+  @UseGuards(AuthGuard('basic'))
+  getHello(@Request() req): string {
+    return req.user;
   }
 }
