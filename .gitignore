@@ -54,3 +54,30 @@ pids
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+libs/prisma/src/generated/client.d.ts
+libs/prisma/src/generated/client.js
+libs/prisma/src/generated/default.d.ts
+libs/prisma/src/generated/default.js
+libs/prisma/src/generated/edge.d.ts
+libs/prisma/src/generated/edge.js
+libs/prisma/src/generated/index-browser.js
+libs/prisma/src/generated/index.d.ts
+libs/prisma/src/generated/index.js
+libs/prisma/src/generated/libquery_engine-darwin-arm64.dylib.node
+libs/prisma/src/generated/package.json
+libs/prisma/src/generated/query_engine_bg.js
+libs/prisma/src/generated/query_engine_bg.wasm
+libs/prisma/src/generated/schema.prisma
+libs/prisma/src/generated/wasm-edge-light-loader.mjs
+libs/prisma/src/generated/wasm-worker-loader.mjs
+libs/prisma/src/generated/wasm.d.ts
+libs/prisma/src/generated/wasm.js
+libs/prisma/src/generated/runtime/edge-esm.js
+libs/prisma/src/generated/runtime/edge.js
+libs/prisma/src/generated/runtime/index-browser.d.ts
+libs/prisma/src/generated/runtime/index-browser.js
+libs/prisma/src/generated/runtime/library.d.ts
+libs/prisma/src/generated/runtime/library.js
+libs/prisma/src/generated/runtime/react-native.js
+libs/prisma/src/generated/runtime/wasm-compiler-edge.js
+libs/prisma/src/generated/runtime/wasm-engine-edge.js

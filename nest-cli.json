@@ -10,6 +10,15 @@
   "monorepo": true,
   "root": "apps/forkast-exchange",
   "projects": {
+    "auth": {
+      "type": "library",
+      "root": "libs/auth",
+      "entryFile": "index",
+      "sourceRoot": "libs/auth/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/auth/tsconfig.lib.json"
+      }
+    },
     "forkast-exchange": {
       "type": "application",
       "root": "apps/forkast-exchange",
@@ -44,6 +53,15 @@
       "sourceRoot": "apps/order-matching-engine/src",
       "compilerOptions": {
         "tsConfigPath": "apps/order-matching-engine/tsconfig.app.json"
+      }
+    },
+    "prisma": {
+      "type": "library",
+      "root": "libs/prisma",
+      "entryFile": "index",
+      "sourceRoot": "libs/prisma/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/prisma/tsconfig.lib.json"
       }
     }
   }
