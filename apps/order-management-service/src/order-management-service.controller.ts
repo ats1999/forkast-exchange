@@ -11,6 +11,6 @@ export class OrderManagementServiceController {
   @Get('hello')
   @UseGuards(AuthGuard('basic'))
   getHello(@Request() req): string {
-    return req.user;
+    return this.orderManagementServiceService.getHello(req.user);
   }
 }
