@@ -1,8 +1,17 @@
-import { Body, Controller, Post, UseGuards, Request } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  UseGuards,
+  Request,
+  Get,
+  Query,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { OrderService } from './order.service';
 import CreateOrderDto from './dto/CreateOrderDTO';
 import CreateOrderUserRequest from './dto/CreateOrderUserRequest';
+import { GetOrdersDto } from './dto/GetOrdersDTO';
 
 @Controller('orders')
 export class OrderController {
@@ -21,5 +30,17 @@ export class OrderController {
 
     const orderId = await this.orderService.publishOrderForTrade(order);
     return { orderId };
+  }
+
+  @UseGuards(AuthGuard('basic'))
+  @Get()
+  async getOrders(@Query() query: GetOrdersDto, @Request() req) {
+    const { page, limit } = query;
+    const orders = await this.orderService.getOrdersByUser(
+      req.user.id,
+      page,
+      limit,
+    );
+    return { page, limit, orders };
   }
 }
