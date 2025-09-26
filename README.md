@@ -1,98 +1,72 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# forkast-exchange
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+`forkast-exchange` is an implementation of a typical stock/crypto exchange system built using modern technologies. It demonstrates an order `matching` engine, `real-time` event streaming using Kafka, Redis, and NestJS. It leverages NestJS, Kafka, and RxJS to achieve low-latency streaming.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Tech Stack
 
-## Description
+- NestJs
+- Kafka
+- Redis
+- PostgreSQL
+- Prisma ORM
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Architecture
 
-## Project setup
+### Core Components
 
-```bash
-$ npm install
-```
+#### Order Book Keeper Service
 
-## Compile and run the project
+- Maintains live buy and sell order books for each symbol.
+- Update PostgreSQL on order update
+- Keeps incremental snapshots (orderBookSnapShotId) to efficiently stream changes.
+- Exposes REST and SSE endpoints for retrieving and streaming order book updates.
 
-```bash
-# development
-$ npm run start
+#### Order Matching Engine
 
-# watch mode
-$ npm run start:dev
+- Matches incoming buy and sell orders based on price-time priority.
+- Emits trades to downstream services using kafka whenever a match occurs.
+- Optimized for high-frequency matching and fault tolerant using durable kafka logs.
 
-# production mode
-$ npm run start:prod
-```
+#### Order Management Service
 
-## Run tests
+- Allows users to create orders (BUY/SELL)
+- Get orders using pagination
+- Cancel order [TODO]
 
-```bash
-# unit tests
-$ npm run test
+### Flow of Orders
 
-# e2e tests
-$ npm run test:e2e
+- A user submits an order through the API to order management service.
+- Order management service validates the request and publishes an event to `orders.new` kafka topic.
+- Order Matching Engine, receives new orders from `orders.new`
+- Order Matching Engine, stores order details in memory and publishes two conditional event - Publishes incoming order from `orders.new` topic directly to `orders.exchange` topic, for updating PostgreSQL - Try to match incoming order, it publishes a `Trade` event into `orders.exchange` topic, if there is any match (Partial/Full).
 
-# test coverage
-$ npm run test:cov
-```
+  > The reason, new order and trade event are being published into `orders.exchange` is to preserve order of updates. We use symbol id as partition key. We need to ensure that order is the first event that should be saved into db before trade.
 
-## Deployment
+- Order book keeper service subscribe to `orders.exchange` topic. It first create in orders in PostgreSQL in batch of 100 orders. Then it updates in-memory order book, which can be them consumed using HTTP/SSE.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## Setup
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+- Clone Repo and Checkout to repo root
+- do `npm i`
+- Install kafka - https://kafka.apache.org/quickstart on default port 9092, or change the env variable `KAFKA_BROKERS`
+- Instal redis on default port 6379, or change the env variable `REDIS_URL`
+- Install PostgreSQL - https://www.postgresql.org/download on default port 5432, or change the env variable `DATABASE_URL`.
+- Create database `forkast_exchange`
+- Create tables by using `psql -d forkast_exchange -f schema.sql`, supply user/name password if required
+- Dump users and symbols data for testing, `psql -d forkast_exchange -f init.sql`, supply user/name password if required
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+Start Servers
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+- Order Matching Engine - `npm run start:engine:dev`, will start server on port 3000
+- Order Management Service - `npm run start:oms:dev`, will start server on port 3001
+- Order Book Keeper Service - `npm run start:bookkeeper:dev`, will start server on port 3002
 
-## Resources
+## APIs
 
-Check out a few resources that may come in handy when working with NestJS:
+Documentation -> https://documenter.getpostman.com/view/17357775/2sB3QDuY5t
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## Other details
 
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- A list of users and stock symbols have been populated inside db from `init.sql`. If not, check `Dump users and symbols data for testing` in above steps.
+- Using HTTP basic auth for simplicity. It requires user id and password, for every user, user's email is id as well as password.
+  - See postman documentation for example, and check https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Authentication for more details

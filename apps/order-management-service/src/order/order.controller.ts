@@ -6,6 +6,7 @@ import {
   Request,
   Get,
   Query,
+  Param,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { OrderService } from './order.service';
@@ -42,5 +43,11 @@ export class OrderController {
       limit,
     );
     return { page, limit, orders };
+  }
+
+  @UseGuards(AuthGuard('basic'))
+  @Get(':id')
+  async getOrderById(@Param('id') id: string, @Request() req) {
+    return this.orderService.getOrderById(id, req.user.id);
   }
 }

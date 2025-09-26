@@ -67,4 +67,27 @@ export class OrderService {
 
     return orders;
   }
+  async getOrderById(orderId: string, userId: number) {
+    const client = this.redisService.getClient();
+    const cacheKey = `order:${orderId}`;
+
+    let order: any = await client.get(cacheKey);
+    if (order) {
+      this.logger.log(`Order ${orderId} found in Redis`);
+      return JSON.parse(order);
+    }
+
+    order = (await this.prisma.order.findUnique({
+      where: { id: orderId },
+    })) as any;
+
+    if (!order || order.userId !== userId) {
+      return null; // order not found or doesn't belong to user
+    }
+
+    await client.setEx(cacheKey, 60, JSON.stringify(order));
+    this.logger.log(`Order ${orderId} cached in Redis`);
+
+    return order;
+  }
 }
