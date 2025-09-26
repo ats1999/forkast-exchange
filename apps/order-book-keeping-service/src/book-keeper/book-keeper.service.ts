@@ -11,8 +11,11 @@ export class BookKeeperService {
   // In-memory order books per symbol
   private buyOrderBooks: Map<number, Order[]> = new Map();
   private sellOrderBooks: Map<number, Order[]> = new Map();
-
   constructor(private readonly prismaService: PrismaService) {}
+
+  // every time order book gets updated, increment counter
+  // counter will not exhaust till the lifetime of the server, because its a 64 bit number, see for more -> https://stackoverflow.com/questions/69375375/is-it-safe-to-assume-64-bit-counter-doesnt-suffer-from-overflow
+  private orderBookSnapShotId: number = 0;
 
   public handleExchange(exchangeMessage: ExchangeMessage) {
     switch (exchangeMessage.type) {
@@ -50,6 +53,7 @@ export class BookKeeperService {
     this.logger.log(
       `Added ${newOrder.side} order: ${JSON.stringify(newOrder)} to order book`,
     );
+    this.orderBookSnapShotId++;
   }
 
   private handleTrade(trade: Trade) {
@@ -94,6 +98,7 @@ export class BookKeeperService {
     }
 
     this.logger.log(`Processed trade: ${JSON.stringify(trade)}`);
+    this.orderBookSnapShotId++;
   }
 
   private removeOrderFromBook(
@@ -122,6 +127,7 @@ export class BookKeeperService {
   }
   public getOrderBook(symbolId: number) {
     return {
+      orderBookSnapShotId: this.orderBookSnapShotId,
       buy: this.buyOrderBooks.get(symbolId) || [],
       sell: this.sellOrderBooks.get(symbolId) || [],
     };

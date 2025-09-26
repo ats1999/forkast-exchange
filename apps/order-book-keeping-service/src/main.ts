@@ -9,7 +9,7 @@ config({ path: join(__dirname, '../../../.env') });
 
 async function bootstrap() {
   const app = await NestFactory.create(OrderBookKeepingServiceModule);
-  const port = process.env.PORT ?? 5000;
+  const port = process.env.PORT ?? 3002;
   await app.listen(port);
   Logger.log(`✅ Orders app is running on http://localhost:${port}`);
 }
