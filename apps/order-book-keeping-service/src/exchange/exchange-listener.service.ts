@@ -7,13 +7,17 @@ import { ExchangeHandlerService } from './exchange-handler.service';
 @Injectable()
 export class ExchangeListenerService implements OnModuleInit, OnModuleDestroy {
   private consumer: Consumer;
+  private static groupId = 'order-book-keeper';
+
   constructor(
     private readonly kafkaService: KafkaService,
     private readonly exchangeHandlerService: ExchangeHandlerService,
   ) {}
 
   async onModuleInit() {
-    this.consumer = this.kafkaService.getConsumer();
+    this.consumer = this.kafkaService.getConsumer(
+      ExchangeListenerService.groupId,
+    );
     await this.consumer.subscribe({
       topic: TOPICS.ORDER_EXCHANGE,
       fromBeginning: true,

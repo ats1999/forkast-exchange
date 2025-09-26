@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { NewOrder, Order } from '@app/types/order/order';
 import { Trade } from '@app/types/exchange/trade';
 import { ExchangeMessage } from '../exchange/types/exchange.message';
+import { PrismaService } from '@app/prisma';
 
 @Injectable()
 export class BookKeeperService {
@@ -11,7 +12,7 @@ export class BookKeeperService {
   private buyOrderBooks: Map<number, Order[]> = new Map();
   private sellOrderBooks: Map<number, Order[]> = new Map();
 
-  constructor() {}
+  constructor(private readonly prismaService: PrismaService) {}
 
   public handleExchange(exchangeMessage: ExchangeMessage) {
     switch (exchangeMessage.type) {
@@ -124,6 +125,19 @@ export class BookKeeperService {
       buy: this.buyOrderBooks.get(symbolId) || [],
       sell: this.sellOrderBooks.get(symbolId) || [],
     };
+  }
+
+  public async createOrders(newOrders: NewOrder[]) {
+    const BATCH_SIZE = 100;
+
+    for (let i = 0; i < newOrders.length; i += BATCH_SIZE) {
+      const batch = newOrders.slice(i, i + BATCH_SIZE);
+
+      await this.prismaService.order.createMany({
+        data: batch,
+        skipDuplicates: true, // ensures "insert if does not exist"
+      });
+    }
   }
 }
 

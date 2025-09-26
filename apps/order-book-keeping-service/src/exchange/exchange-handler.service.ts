@@ -4,6 +4,7 @@ import { ExchangeMessage } from './types/exchange.message';
 import { BookKeeperService } from '../book-keeper/book-keeper.service';
 import { TradeExecutionService } from '../trade/trade-execution.service';
 import { Trade } from '@app/types/exchange/trade';
+import { NewOrder } from '@app/types/order/order';
 
 @Injectable()
 export class ExchangeHandlerService {
@@ -20,6 +21,7 @@ export class ExchangeHandlerService {
     }
 
     const trades: Trade[] = [] as Trade[];
+    const newOrders: NewOrder[] = [] as NewOrder[];
 
     messages.forEach((msg) => {
       const value = msg.message.value!?.toString();
@@ -28,9 +30,13 @@ export class ExchangeHandlerService {
 
       if (exchangeMessage.type === 'TRADE') {
         trades.push(exchangeMessage.data as Trade);
+      } else {
+        newOrders.push(exchangeMessage.data as NewOrder);
       }
     });
 
+    // create orders first before performing trades due to foreign key checks
+    await this.bookKeeperService.createOrders(newOrders);
     this.tradeExecutionService.performTradeExecution(trades);
   }
 }

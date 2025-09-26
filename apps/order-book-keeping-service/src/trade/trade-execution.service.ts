@@ -125,7 +125,7 @@ export class TradeExecutionService {
   private async createTrades(tx: Prisma.TransactionClient, trades: Trade[]) {
     return tx.trade.createMany({
       data: trades.map((trade) => ({
-        tradeId: trade.tradeId,
+        id: trade.tradeId,
         symbolId: trade.symbolId,
         price: trade.price,
         quantity: trade.quantity,

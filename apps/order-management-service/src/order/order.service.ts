@@ -18,7 +18,7 @@ export class OrderService {
   async publishOrderForTrade(order: CreateOrderDto): Promise<string> {
     if (order.type === 'LIMIT' && !order.price) {
       throw new HttpException(
-        'Price must be provided for LIMIT and MARKET orders',
+        'Price must be provided for LIMIT orders',
         HttpStatus.BAD_REQUEST,
       );
     }

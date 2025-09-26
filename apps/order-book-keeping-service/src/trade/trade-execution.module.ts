@@ -5,5 +5,6 @@ import { TradeExecutionService } from './trade-execution.service';
 @Module({
   imports: [PrismaModule],
   providers: [TradeExecutionService],
+  exports: [TradeExecutionService],
 })
 export class TradeExecutionModule {}
