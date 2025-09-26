@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { KafkaModule } from '@app/infra/kafka';
-import { ExchangeHandlerService } from './exchange-handler.service';
-import { ExchangeListenerService } from './exchange-listener.service';
+import { ExchangeHandlerService } from '../exchange/exchange-handler.service';
+import { ExchangeListenerService } from '../exchange/exchange-listener.service';
 import { BookKeeperService } from './book-keeper.service';
 
 @Module({

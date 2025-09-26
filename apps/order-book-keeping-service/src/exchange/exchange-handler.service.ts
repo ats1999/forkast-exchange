@@ -1,16 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Kafka, KafkaMessage } from 'kafkajs';
-import { NewOrder } from '@app/types/order/order';
-import { Trade } from '@app/types/exchange/trade';
+import { KafkaMessage } from 'kafkajs';
 import { ExchangeMessage } from './types/exchange.message';
-import { BookKeeperService } from './book-keeper.service';
+import { BookKeeperService } from '../book-keeper/book-keeper.service';
 
 @Injectable()
 export class ExchangeHandlerService {
   private readonly logger = new Logger(ExchangeHandlerService.name);
 
   constructor(private readonly bookKeeperService: BookKeeperService) {}
-  async handleNewOrder(partition: number, message: KafkaMessage) {
+  async handleNewOrder(_partition: number, message: KafkaMessage) {
     if (!message.value) {
       return;
     }

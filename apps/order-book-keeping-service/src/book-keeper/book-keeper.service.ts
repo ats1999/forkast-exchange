@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { NewOrder, Order } from '@app/types/order/order';
 import { Trade } from '@app/types/exchange/trade';
-import { ExchangeMessage } from './types/exchange.message';
+import { ExchangeMessage } from '../exchange/types/exchange.message';
 
 @Injectable()
 export class BookKeeperService {
