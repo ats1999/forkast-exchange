@@ -20,7 +20,6 @@ export class OrderListenerService implements OnModuleInit, OnModuleDestroy {
     });
 
     this.consumer.run({
-      autoCommit: false,
       eachMessage: async ({ topic, partition, message }) => {
         this.orderHandler.handleNewOrder(partition, message);
       },

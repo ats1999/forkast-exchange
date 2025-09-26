@@ -1,20 +1,20 @@
-import { Injectable } from '@nestjs/common';
-import { KafkaMessage } from 'kafkajs';
+import { Injectable, Logger } from '@nestjs/common';
 import { OrderExchangePublisherService } from '../order-exchnage-publisher.service';
-import { Order } from '@app/types/order/order';
+import { NewOrder } from '@app/types/order/order';
 import { Trade } from '@app/types/exchange/trade';
 
-const buyOrderBooks: Map<number, Order[]> = new Map();
-const sellOrderBooks: Map<number, Order[]> = new Map();
+const buyOrderBooks: Map<number, NewOrder[]> = new Map();
+const sellOrderBooks: Map<number, NewOrder[]> = new Map();
+const orderDedupeSet: Set<string> = new Set();
 
-function buyOrderComparator(order1: Order, order2: Order) {
+function buyOrderComparator(order1: NewOrder, order2: NewOrder) {
   if (order1.price === null && order2.price === null) return 0;
   if (order1.price === null) return -1;
   if (order2.price === null) return 1;
   return order2.price! - order1.price!;
 }
 
-function sellOrderComparator(order1: Order, order2: Order) {
+function sellOrderComparator(order1: NewOrder, order2: NewOrder) {
   if (order1.price === null && order2.price === null) return 0;
   if (order1.price === null) return -1;
   if (order2.price === null) return 1;
@@ -23,22 +23,25 @@ function sellOrderComparator(order1: Order, order2: Order) {
 
 @Injectable()
 export class ExchangeService {
+  private readonly logger = new Logger(ExchangeService.name);
+
   constructor(
     private readonly orderExchangePublisher: OrderExchangePublisherService,
   ) {}
 
-  // TODO: user can not buy his own sell orders and vice versa
-  handleNewOrder(partition: number, message: KafkaMessage) {
-    console.log(`Received message on partition ${partition}: ${message.value}`);
-    if (!message.value) return;
-    const order: Order = JSON.parse(message.value!.toString());
-    this.addOrder(order);
+  handleNewOrder(partition: number, newOrder: NewOrder) {
+    if (orderDedupeSet.has(newOrder.id)) {
+      this.logger.warn(
+        `Duplicate order received with key ${newOrder.id}, ignoring.`,
+      );
+      return;
+    }
 
-    // errors can be retried in production and logged to a centralized system
-    this.matchOrders(order.symbolId).catch(console.error);
+    this.addOrder(newOrder);
+    this.matchOrders(newOrder.symbolId).catch(this.logger.error);
   }
 
-  private addOrder(order: Order) {
+  private addOrder(order: NewOrder) {
     // Get or create the order book for this symbol
     const buyOrders = buyOrderBooks.get(order.symbolId) || [];
     const sellOrders = sellOrderBooks.get(order.symbolId) || [];
@@ -91,9 +94,7 @@ export class ExchangeService {
           timestamp: Date.now(),
         };
 
-        // Debug log (remove in prod)
-        console.log('Trade executed:', trade);
-
+        this.logger.log(`Trade executed: ${JSON.stringify(trade)}`);
         await this.orderExchangePublisher.publishOrder('TRADE', trade);
 
         buy.quantity -= quantity;

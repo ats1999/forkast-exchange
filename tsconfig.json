@@ -12,6 +12,7 @@
     "allowSyntheticDefaultImports": true,
     "target": "ES2023",
     "sourceMap": true,
+    "inlineSources": true,
     "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true,
@@ -22,24 +23,14 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@app/auth": [
-        "libs/auth/src"
-      ],
-      "@app/auth/*": [
-        "libs/auth/src/*"
-      ],
-      "@app/infra": [
-        "libs/infra/src"
-      ],
-      "@app/infra/*": [
-        "libs/infra/src/*"
-      ],
-      "@app/prisma": [
-        "libs/prisma/src"
-      ],
-      "@app/prisma/*": [
-        "libs/prisma/src/*"
-      ]
+      "@app/auth": ["libs/auth/src"],
+      "@app/auth/*": ["libs/auth/src/*"],
+      "@app/infra": ["libs/infra/src"],
+      "@app/infra/*": ["libs/infra/src/*"],
+      "@app/prisma": ["libs/prisma/src"],
+      "@app/prisma/*": ["libs/prisma/src/*"],
+      "@app/types": ["libs/types/src"],
+      "@app/types/*": ["libs/types/src/*"]
     }
   }
 }

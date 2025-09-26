@@ -9,8 +9,9 @@
     "build": "nest build",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
-    "start:bookkeeper:dev": "nest start order-book-keeping-service --watch",
-    "start:oms:dev": "nest start order-management-service --watch",
+    "start:bookkeeper:dev": "nest start order-book-keeping-service --watch --debug",
+    "start:oms:dev": "nest start order-management-service --watch -debug",
+    "start:engine:dev": "nest start order-matching-engine --watch --debug",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/apps/forkast-exchange/main",
@@ -86,7 +87,8 @@
     "moduleNameMapper": {
       "^@app/auth(|/.*)$": "<rootDir>/libs/auth/src/$1",
       "^@app/infra(|/.*)$": "<rootDir>/libs/infra/src/$1",
-      "^@app/prisma(|/.*)$": "<rootDir>/libs/prisma/src/$1"
+      "^@app/prisma(|/.*)$": "<rootDir>/libs/prisma/src/$1",
+      "^@app/types(|/.*)$": "<rootDir>/libs/types/src/$1"
     }
   }
 }

@@ -2,6 +2,8 @@ import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { KafkaService } from '@app/infra/kafka';
 import { Producer } from 'kafkajs';
 import { TOPICS } from '@app/infra/kafka/topics';
+import { NewOrder } from '@app/types/order/order';
+import { Trade } from '@app/types/exchange/trade';
 
 @Injectable()
 export class OrderExchangePublisherService
@@ -22,7 +24,7 @@ export class OrderExchangePublisherService
     }
   }
 
-  async publishOrder(type: 'ORDER' | 'TRADE', data: any) {
+  async publishOrder(type: 'ORDER' | 'TRADE', data: NewOrder | Trade) {
     const dataToSend = {
       type,
       data,
