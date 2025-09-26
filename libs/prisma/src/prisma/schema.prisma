@@ -56,8 +56,11 @@ model Order {
     executedAt     DateTime?
 
     // Relation
-    user   User    @relation(fields: [userId], references: [id])
-    symbol Symbol? @relation(fields: [symbolId], references: [id])
+    user       User    @relation(fields: [userId], references: [id])
+    symbol     Symbol? @relation(fields: [symbolId], references: [id])
+    buyTrades  Trade[] @relation("BuyTrades")
+    sellTrades Trade[] @relation("SellTrades")
+    Trade      Trade[]
 }
 
 model Symbol {
@@ -69,4 +72,26 @@ model Symbol {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     Order     Order[]
+    Trade     Trade[]
+}
+
+model Trade {
+    id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    symbolId    Int
+    price       Decimal
+    quantity    Int
+    buyOrderId  String
+    sellOrderId String
+    timestamp   DateTime @default(now())
+
+    // Relations
+    symbol    Symbol  @relation(fields: [symbolId], references: [id])
+    buyOrder  Order   @relation("BuyTrades", fields: [buyOrderId], references: [id])
+    sellOrder Order   @relation("SellTrades", fields: [sellOrderId], references: [id])
+    Order     Order?  @relation(fields: [orderId], references: [id])
+    orderId   String? @db.Uuid
+
+    @@index([symbolId])
+    @@index([buyOrderId])
+    @@index([sellOrderId])
 }
