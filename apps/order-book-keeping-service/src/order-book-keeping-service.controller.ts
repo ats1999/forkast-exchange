@@ -1,12 +1,14 @@
-import { Controller, Get } from '@nestjs/common';
-import { OrderBookKeepingServiceService } from './order-book-keeping-service.service';
+import { Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { BookKeeperService } from './book-keeper/book-keeper.service';
 
 @Controller()
 export class OrderBookKeepingServiceController {
-  constructor(private readonly orderBookKeepingServiceService: OrderBookKeepingServiceService) {}
+  constructor(private readonly bookKeeperService: BookKeeperService) {}
 
-  @Get()
-  getHello(): string {
-    return this.orderBookKeepingServiceService.getHello();
+  @UseGuards(AuthGuard('basic'))
+  @Get(':symbolId')
+  getOrderBook(@Param('symbolId') symbolId: string) {
+    return this.bookKeeperService.getOrderBook(Number(symbolId));
   }
 }

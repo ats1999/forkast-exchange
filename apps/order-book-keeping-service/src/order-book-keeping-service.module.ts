@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { OrderBookKeepingServiceController } from './order-book-keeping-service.controller';
-import { OrderBookKeepingServiceService } from './order-book-keeping-service.service';
 import { ExchangeModule } from './exchange/exchange.module';
+import { AuthModule } from '@app/auth';
+import { BooKeeperModule } from './book-keeper/book-keeper.module';
 
 @Module({
-  imports: [ExchangeModule],
+  imports: [ExchangeModule, AuthModule, BooKeeperModule],
   controllers: [OrderBookKeepingServiceController],
-  providers: [OrderBookKeepingServiceService],
+  providers: [],
 })
 export class OrderBookKeepingServiceModule {}
