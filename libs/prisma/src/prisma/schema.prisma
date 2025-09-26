@@ -6,7 +6,8 @@
 
 generator client {
     provider = "prisma-client-js"
-    output   = "../generated"
+    // keep output to node modules so that prisma client can easily import them
+    output   = "../../../../node_modules/.prisma/client"
     env      = "../../../.env"
 }
 
@@ -80,8 +81,8 @@ model Trade {
     symbolId    Int
     price       Decimal
     quantity    Int
-    buyOrderId  String
-    sellOrderId String
+    buyOrderId  String   @db.Uuid
+    sellOrderId String   @db.Uuid
     timestamp   DateTime @default(now())
 
     // Relations

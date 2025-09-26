@@ -15,7 +15,7 @@ export class ExchangeListenerService implements OnModuleInit, OnModuleDestroy {
   async onModuleInit() {
     this.consumer = this.kafkaService.getConsumer();
     await this.consumer.subscribe({
-      topic: TOPICS.NEW_ORDER,
+      topic: TOPICS.ORDER_EXCHANGE,
       fromBeginning: true,
     });
 

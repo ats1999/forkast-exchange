@@ -81,3 +81,5 @@ libs/prisma/src/generated/runtime/library.js
 libs/prisma/src/generated/runtime/react-native.js
 libs/prisma/src/generated/runtime/wasm-compiler-edge.js
 libs/prisma/src/generated/runtime/wasm-engine-edge.js
+libs/prisma/src/prisma/migrations/migration_lock.toml
+libs/prisma/src/prisma/migrations/20250926032332_x/migration.sql
