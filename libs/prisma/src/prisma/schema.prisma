@@ -1,0 +1,98 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+    provider = "prisma-client-js"
+    // keep output to node modules so that prisma client can easily import them
+    output   = "../../../../node_modules/.prisma/client"
+    env      = "../../../.env"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id        Int      @id @default(autoincrement())
+    email     String   @unique
+    name      String
+    password  String
+    createdAt DateTime @default(now())
+    Order     Order[]
+}
+
+enum OrderType {
+    MARKET
+    LIMIT
+}
+
+enum OrderStatus {
+    PENDING
+    PARTIALLY_FILLED
+    FILLED
+    CANCELLED
+}
+
+enum OrderSide {
+    BUY
+    SELL
+}
+
+model Order {
+    id             String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    userId         Int
+    symbolId       Int
+    type           OrderType
+    price          Decimal? // nullable for market orders
+    quantity       Int
+    filledQuantity Int         @default(0)
+    status         OrderStatus @default(PENDING)
+    side           OrderSide
+    createdAt      DateTime    @default(now())
+    updatedAt      DateTime    @updatedAt
+    executedAt     DateTime?
+
+    // Relation
+    user       User    @relation(fields: [userId], references: [id])
+    symbol     Symbol? @relation(fields: [symbolId], references: [id])
+    buyTrades  Trade[] @relation("BuyTrades")
+    sellTrades Trade[] @relation("SellTrades")
+    Trade      Trade[]
+}
+
+model Symbol {
+    id        Int      @id @default(autoincrement())
+    symbol    String   @unique
+    name      String
+    market    String // e.g., NASDAQ, NYSE
+    currency  String   @default("USD")
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    Order     Order[]
+    Trade     Trade[]
+}
+
+model Trade {
+    id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    symbolId    Int
+    price       Decimal
+    quantity    Int
+    buyOrderId  String   @db.Uuid
+    sellOrderId String   @db.Uuid
+    timestamp   DateTime @default(now())
+
+    // Relations
+    symbol    Symbol  @relation(fields: [symbolId], references: [id])
+    buyOrder  Order   @relation("BuyTrades", fields: [buyOrderId], references: [id])
+    sellOrder Order   @relation("SellTrades", fields: [sellOrderId], references: [id])
+    Order     Order?  @relation(fields: [orderId], references: [id])
+    orderId   String? @db.Uuid
+
+    @@index([symbolId])
+    @@index([buyOrderId])
+    @@index([sellOrderId])
+}
