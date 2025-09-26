@@ -20,8 +20,13 @@ export class ExchangeListenerService implements OnModuleInit, OnModuleDestroy {
     });
 
     this.consumer.run({
-      eachMessage: async ({ topic, partition, message }) => {
-        this.exchangeHandlerService.handleNewOrder(partition, message);
+      eachBatch: async ({ batch }) => {
+        const messages = batch.messages.map((msg) => ({
+          message: msg,
+          partition: batch.partition,
+        }));
+
+        await this.exchangeHandlerService.handleExchangeBatch(messages);
       },
     });
   }
